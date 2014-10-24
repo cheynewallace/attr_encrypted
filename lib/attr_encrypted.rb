@@ -122,12 +122,6 @@ module AttrEncrypted
 
     options[:encode] = options[:default_encoding] if options[:encode] == true
 
-    if options[:mode] == :single_iv_and_salt
-      # Clear any potential left over values from previous crypts
-      encrypted_attributes[:content].delete(:iv)
-      encrypted_attributes[:content].delete(:salt)
-    end
-
     attributes.each do |attribute|
       encrypted_attribute_name = (options[:attribute] ? options[:attribute] : [options[:prefix], attribute, options[:suffix]].join).to_sym
       iv_name = "#{encrypted_attribute_name}_iv".to_sym
@@ -197,6 +191,13 @@ module AttrEncrypted
   #   email = User.decrypt(:email, 'SOME_ENCRYPTED_EMAIL_STRING')
   def decrypt(attribute, encrypted_value, options = {})
     options = encrypted_attributes[attribute.to_sym].merge(options)
+
+    if options[:mode] == :single_iv_and_salt
+      # Clear any potential left over values from previous crypts
+      encrypted_attributes[:content].delete(:iv)
+      encrypted_attributes[:content].delete(:salt)
+    end
+
     if options[:if] && !options[:unless] && !encrypted_value.nil? && !(encrypted_value.is_a?(String) && encrypted_value.empty?)
       encrypted_value = encrypted_value.unpack(options[:encode]).first if options[:encode]
       value = options[:encryptor].send(options[:decrypt_method], options.merge!(:value => encrypted_value))
