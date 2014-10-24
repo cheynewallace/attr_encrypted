@@ -194,8 +194,8 @@ module AttrEncrypted
 
     if options[:mode] == :single_iv_and_salt
       # Clear any potential left over values from previous crypts
-      encrypted_attributes[:content].delete(:iv)
-      encrypted_attributes[:content].delete(:salt)
+      options.delete(:iv)
+      options.delete(:salt)
     end
 
     if options[:if] && !options[:unless] && !encrypted_value.nil? && !(encrypted_value.is_a?(String) && encrypted_value.empty?)
