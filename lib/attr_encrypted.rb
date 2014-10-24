@@ -122,6 +122,12 @@ module AttrEncrypted
 
     options[:encode] = options[:default_encoding] if options[:encode] == true
 
+    if options[:mode] == :single_iv_and_salt
+      # Clear any potential left over values from previous crypts
+      encrypted_attributes[:content].delete(:iv)
+      encrypted_attributes[:content].delete(:salt)
+    end
+
     attributes.each do |attribute|
       encrypted_attribute_name = (options[:attribute] ? options[:attribute] : [options[:prefix], attribute, options[:suffix]].join).to_sym
       iv_name = "#{encrypted_attribute_name}_iv".to_sym
